@@ -4,7 +4,7 @@ from pyglet.window import key
 from random import choice
 
 def draw_grid():
-  global square_verts, grid, colors, snakes, grid_width, grid_height, square_size
+  global square_verts, grid, colors, snakes, grid_width, grid_height, square_size, arena_border
   glBegin(GL_QUADS)  
   for y in range(grid_height):
     for x in range(grid_width):
@@ -22,8 +22,8 @@ def draw_grid():
           r, g, b = colors[state]
           glColor3f(r * fade, g * fade, b * fade)
           for vx,vy in square_verts:
-            vx += 10 + (x * square_size)
-            vy += 10 + (y * square_size)
+            vx += arena_border + (x * square_size)
+            vy += arena_border + (y * square_size)
             glVertex2f(vx, vy)
   glEnd()
 
@@ -37,15 +37,21 @@ def draw_arena():
   glEnd()
 
 def draw_header():
-  global header_img
+  global header_img, arena_border, arena_height
   glColor3f(1, 1, 1)
-  header_img.blit(10, 520)
+  header_img.blit(arena_border, arena_border + arena_border + arena_height)
 
-screen_width = 720
-screen_height = 570
-square_size = 10
-grid_width = 700 / square_size 
-grid_height = 500 / square_size
+screen_width = 740
+screen_height = 550
+
+arena_width = 720
+arena_height = 480
+arena_border = 10
+
+#2,3,4,5,6,8,10,12,15,16,20,24,30,40
+square_size = 8
+grid_width = arena_width / square_size 
+grid_height = arena_height / square_size
 
 win = window.Window(visible=False,width=screen_width,height=screen_height)
 win.set_visible()
@@ -54,8 +60,19 @@ fps_limit = 15
 clock.set_fps_limit(fps_limit)
 keyboard = key.KeyStateHandler()
 
-arena_verts =  [(9,9),(711,9),(711,511),(9,511),(9,9)]
-square_verts = [(0,0),(square_size-1,0),(square_size-1,square_size-1),(0,square_size-1)]
+arena_verts =  [
+  (arena_border-1,arena_border-2),
+  (arena_border+arena_width+1,arena_border-2),
+  (arena_border+arena_width+1,arena_border+arena_height),
+  (arena_border-1,arena_border+arena_height),
+  (arena_border-1,arena_border-2)
+]
+square_verts = [
+  (0,0),
+  (square_size-1,0),
+  (square_size-1,square_size-1),
+  (0,square_size-1)
+]
 
 grid = [[(0,0)]*grid_width for i in range(grid_height)]
 
@@ -89,19 +106,20 @@ colors = [
   (1,     1,   1)        
 ]
 
+#off, human, cpu, drone
 snakes = [
-  {'id':  1,'type': 'human','tail':199,'x': 2,'y': 5,'dir': 1,'points': 0,'reset': False,'up': key.UP,'right': key.RIGHT,'down': key.DOWN,'left': key.LEFT},
-  {'id':  2,'type': 'cpu','tail':199,'x': 4,'y': 5,'dir': 1,'points': 0,'reset': False,'up': key.W ,'right': key.D    ,'down': key.S   ,'left': key.A},
-  {'id':  3,'type': 'off','tail':99,'x': 6,'y': 5,'dir': 1,'points': 0,'reset': False,'up': key.T ,'right': key.H    ,'down': key.G   ,'left': key.F},
-  {'id':  4,'type': 'off','tail':99,'x': 8,'y': 5,'dir': 1,'points': 0,'reset': False,'up': key.I ,'right': key.L    ,'down': key.K   ,'left': key.J},
-  {'id':  5,'type': 'off','tail':99,'x':10,'y': 5,'dir': 1,'points': 0,'reset': False,'up': 0,'right': 0,'down': 0,'left': 0},
-  {'id':  6,'type': 'off','tail':99,'x':12,'y': 5,'dir': 1,'points': 0,'reset': False,'up': 0,'right': 0,'down': 0,'left': 0},
-  {'id':  7,'type': 'off','tail':99,'x': 3,'y': 7,'dir': 1,'points': 0,'reset': False,'up': 0,'right': 0,'down': 0,'left': 0},
-  {'id':  8,'type': 'off','tail':99,'x': 5,'y': 7,'dir': 1,'points': 0,'reset': False,'up': 0,'right': 0,'down': 0,'left': 0},
-  {'id':  9,'type': 'off','tail':99,'x': 7,'y': 7,'dir': 1,'points': 0,'reset': False,'up': 0,'right': 0,'down': 0,'left': 0},
-  {'id': 10,'type': 'off','tail':99,'x': 9,'y': 7,'dir': 1,'points': 0,'reset': False,'up': 0,'right': 0,'down': 0,'left': 0},
-  {'id': 11,'type': 'off','tail':99,'x':11,'y': 7,'dir': 1,'points': 0,'reset': False,'up': 0,'right': 0,'down': 0,'left': 0},
-  {'id': 12,'type': 'off','tail':99,'x':13,'y': 7,'dir': 1,'points': 0,'reset': False,'up': 0,'right': 0,'down': 0,'left': 0}
+  {'id':  1,'type':   'cpu','tail':199,'x': 1,'y': 1,'dir': 0,'points': 0,'reset': False,'up': key.UP,'right': key.RIGHT,'down': key.DOWN,'left': key.LEFT},
+  {'id':  2,'type':   'cpu','tail':199,'x': 2,'y': 2,'dir': 0,'points': 0,'reset': False,'up': key.W ,'right': key.D    ,'down': key.S   ,'left': key.A},
+  {'id':  3,'type':   'cpu','tail':199,'x': 3,'y': 3,'dir': 0,'points': 0,'reset': False,'up': key.T ,'right': key.H    ,'down': key.G   ,'left': key.F},
+  {'id':  4,'type':   'cpu','tail':199,'x': 4,'y': 4,'dir': 0,'points': 0,'reset': False,'up': key.I ,'right': key.L    ,'down': key.K   ,'left': key.J},
+  {'id':  5,'type':   'cpu','tail':199,'x': 5,'y': 5,'dir': 0,'points': 0,'reset': False,'up': 0,'right': 0,'down': 0,'left': 0},
+  {'id':  6,'type':   'cpu','tail':199,'x': 6,'y': 6,'dir': 0,'points': 0,'reset': False,'up': 0,'right': 0,'down': 0,'left': 0},
+  {'id':  7,'type':   'off','tail': 29,'x': 7,'y': 1,'dir': 0,'points': 0,'reset': False,'up': 0,'right': 0,'down': 0,'left': 0},
+  {'id':  8,'type':   'off','tail': 29,'x': 8,'y': 2,'dir': 0,'points': 0,'reset': False,'up': 0,'right': 0,'down': 0,'left': 0},
+  {'id':  9,'type':   'off','tail': 29,'x': 9,'y': 3,'dir': 0,'points': 0,'reset': False,'up': 0,'right': 0,'down': 0,'left': 0},
+  {'id': 10,'type':   'off','tail': 29,'x':10,'y': 4,'dir': 0,'points': 0,'reset': False,'up': 0,'right': 0,'down': 0,'left': 0},
+  {'id': 11,'type':   'off','tail': 29,'x':11,'y': 5,'dir': 0,'points': 0,'reset': False,'up': 0,'right': 0,'down': 0,'left': 0},
+  {'id': 12,'type':   'off','tail': 29,'x':12,'y': 6,'dir': 0,'points': 0,'reset': False,'up': 0,'right': 0,'down': 0,'left': 0}
 ]
 
 for snake in snakes:
